@@ -54,7 +54,10 @@ def generate_text(prompt, max_tokens=500, temperature=1):
     
     # Parse the response
     response_body = json.loads(response.get('body').read())
-    return response_body
+    content = response_body.get('content')
+    # [0].get('text')
+    text = ''.join((c['text'] for c in content))
+    return text
 
 # Example usage
 if __name__ == "__main__":
