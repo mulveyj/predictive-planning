@@ -28,8 +28,8 @@ for message in st.session_state.messages:
 if prompt:= st.chat_input('What do you want to know about the data?'):
     st.session_state.messages.append({'role': 'user', 'content': prompt})
     with st.chat_message('user'):
-        st.markdown(BASE_PROMPT + prompt)
-    raw_response = generate_text(prompt)
+        st.markdown(prompt)
+    raw_response = generate_text(BASE_PROMPT + prompt)
     response = ModelResponse(text=raw_response, error=None)
     if response.error:
         st.session_state.messages.append({'role': 'assistant', 'content': str(response.error)})
