@@ -1,10 +1,23 @@
 import boto3
 import json
+from random import randint
 
 bedrock = boto3.client(
     service_name='bedrock-runtime',
     region_name='us-west-2'
 )
+
+bedrock_agent = boto3.client('bedrock-agent-runtime')
+
+AGENT_ID = '8RSPIPN0XN'
+
+AGENT_ALIAS = 'TJNQ3MDLSL'
+
+session_id = f'COTSWOLD-{randint(10000, 99999)}'
+
+MODEL_ARN = 'arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0'
+
+KB_ID = 'SFUSG2PIGD'
 
 BASE_PROMPT = (
         "You are an expert advisor assisting a local council officer responsible for housing strategy. "
@@ -58,6 +71,22 @@ def generate_text(prompt, max_tokens=500, temperature=1):
     # [0].get('text')
     text = ''.join((c['text'] for c in content))
     return text
+
+def get_with_knowledge_base(query, max_tokens=500, temperature=1, session_id=session_id):
+    
+    response = bedrock_agent.invoke_agent(
+        inputText=query,
+        agentAliasId=AGENT_ALIAS,
+        agentId=AGENT_ID,
+        sessionId = session_id
+    )
+
+    session_id = response['sessionId']
+
+    text_response = ''.join([c['chunk']['bytes'].decode('utf-8') for c in response['completion']])
+
+    return text_response
+
 
 # Example usage
 if __name__ == "__main__":

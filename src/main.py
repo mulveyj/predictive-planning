@@ -4,7 +4,7 @@ from streamlit.errors import StreamlitAPIException
 import ast
 import random
 from attrs import define
-from bedrock_integration import generate_text, BASE_PROMPT
+from bedrock_integration import generate_text, BASE_PROMPT, get_with_knowledge_base
 
 st.title('Predictive Planner')
 
@@ -29,7 +29,8 @@ if prompt:= st.chat_input('What do you want to know about the data?'):
     st.session_state.messages.append({'role': 'user', 'content': prompt})
     with st.chat_message('user'):
         st.markdown(BASE_PROMPT + prompt)
-    raw_response = generate_text(prompt)
+    # raw_response = generate_text(prompt)
+    raw_response = get_with_knowledge_base(BASE_PROMPT + prompt)
     response = ModelResponse(text=raw_response, error=None)
     if response.error:
         st.session_state.messages.append({'role': 'assistant', 'content': str(response.error)})
