@@ -5,8 +5,9 @@ import ast
 import random
 from attrs import define
 from bedrock_integration import generate_text, BASE_PROMPT, get_with_knowledge_base
+from excel_helper import create_excel, FORECAST_JSON
 
-st.title('Predictive Planner')
+st.title('Dwella')
 
 
 @define
@@ -43,3 +44,24 @@ if prompt:= st.chat_input('What do you want to know about the data?'):
         st.session_state.messages.append({'role': 'assistant', 'content': str(result)})
         with st.chat_message('assistant'):
             st.write(result)
+
+    with st.chat_message('assistant'):
+        st.markdown("Here is a file with some useful data:")
+        try:
+            df = create_excel(FORECAST_JSON['forecast'])
+            st.dataframe(df)
+            with open("bungalow_housing_forecast_analysis2.xlsx", "rb") as f:
+                excel_data = f.read()
+
+            chart_data = df[['Year', 'Predicted Demand', 'Predicted Supply']]
+            st.subheader("Line Chart")
+            st.line_chart(chart_data, x='Year')
+
+            st.download_button(
+                label="📥 Download Excel File",
+                data=excel_data,
+                file_name="bungalow_housing_forecast_analysis2.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        except FileNotFoundError:
+            st.error("Excel file not found. Make sure it's named correctly and exists.")
